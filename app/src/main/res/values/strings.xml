@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">APK Контейнер</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Мои приложения</string>
+    <string name="home_empty_title">Пока пусто</string>
+    <string name="home_empty_description">Нажмите кнопку + чтобы проанализировать и установить APK-файл в безопасной песочнице</string>
+    <string name="home_install_apk">Установить APK</string>
+    <string name="home_risk_score">Риск: %d/100</string>
+    <string name="home_network_requests">Сетевых запросов: %d</string>
+
+    <!-- Install Screen -->
+    <string name="install_title">Установка APK</string>
+    <string name="install_select_file">Выберите APK-файл</string>
+    <string name="install_select_description">Выберите APK-файл для анализа безопасности перед установкой в песочницу</string>
+    <string name="install_drag_hint">Или откройте APK-файл через файловый менеджер</string>
+
+    <!-- Analysis Screen -->
+    <string name="analysis_title">Анализ безопасности</string>
+    <string name="analysis_permissions">Разрешения</string>
+    <string name="analysis_components">Компоненты</string>
+    <string name="analysis_risk_score">Оценка риска</string>
+    <string name="analysis_risk_low">Низкий риск</string>
+    <string name="analysis_risk_medium">Средний риск</string>
+    <string name="analysis_risk_high">Высокий риск</string>
+    <string name="analysis_risk_critical">Критический риск</string>
+    <string name="analysis_install_sandbox">Установить в песочницу</string>
+    <string name="analysis_cancel">Отменить</string>
+    <string name="analysis_warning_sms_internet">Приложение запрашивает доступ к SMS и интернету — потенциально опасно!</string>
+    <string name="analysis_warning_contacts_internet">Приложение может читать контакты и отправлять данные в сеть</string>
+    <string name="analysis_warning_camera_mic">Приложение запрашивает доступ к камере и микрофону</string>
+    <string name="analysis_package_name">Пакет: %s</string>
+    <string name="analysis_version">Версия: %s</string>
+    <string name="analysis_activities_count">Экранов: %d</string>
+    <string name="analysis_services_count">Сервисов: %d</string>
+    <string name="analysis_receivers_count">Приёмников: %d</string>
+
+    <!-- Detail Screen -->
+    <string name="detail_tab_overview">Обзор</string>
+    <string name="detail_tab_permissions">Разрешения</string>
+    <string name="detail_tab_network">Сеть</string>
+    <string name="detail_uninstall">Удалить</string>
+    <string name="detail_launch">Запустить</string>
+
+    <!-- Permissions Screen -->
+    <string name="permissions_title">Разрешения</string>
+    <string name="permissions_critical">Критические</string>
+    <string name="permissions_high">Высокие</string>
+    <string name="permissions_medium">Средние</string>
+    <string name="permissions_low">Низкие</string>
+    <string name="permissions_none">Приложение не запрашивает опасных разрешений</string>
+
+    <!-- Network Screen -->
+    <string name="network_title">Сетевая активность</string>
+    <string name="network_enable_monitoring">Включить мониторинг</string>
+    <string name="network_disable_monitoring">Выключить мониторинг</string>
+    <string name="network_no_data">Нет данных о сетевой активности</string>
+    <string name="network_vpn_required">Для мониторинга необходимо включить VPN</string>
+    <string name="network_total_sent">Отправлено: %s</string>
+    <string name="network_total_received">Получено: %s</string>
+    <string name="network_filter_all">Все</string>
+    <string name="network_filter_http">HTTP</string>
+    <string name="network_filter_https">HTTPS</string>
+    <string name="network_filter_dns">DNS</string>
+    <string name="network_suspicious">Подозрительный адрес</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_vpn_monitoring">VPN-мониторинг</string>
+    <string name="settings_vpn_description">Отслеживание сетевой активности приложений</string>
+    <string name="settings_auto_analysis">Автоматический анализ</string>
+    <string name="settings_auto_analysis_description">Анализировать APK при установке</string>
+    <string name="settings_theme">Тема оформления</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_theme_system">Системная</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_about_description">APK Контейнер — безопасная песочница для Android-приложений</string>
+    <string name="settings_version">Версия %s</string>
+    <string name="settings_export_report">Экспорт отчёта</string>
+
+    <!-- Common -->
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="error">Ошибка</string>
+    <string name="loading">Загрузка…</string>
+    <string name="unknown">Неизвестно</string>
+
+    <!-- Permission Descriptions -->
+    <string name="perm_internet">Доступ в интернет</string>
+    <string name="perm_internet_desc">Может отправлять и получать данные из сети</string>
+    <string name="perm_camera">Доступ к камере</string>
+    <string name="perm_camera_desc">Может делать фото и видео</string>
+    <string name="perm_microphone">Доступ к микрофону</string>
+    <string name="perm_microphone_desc">Может записывать звук</string>
+    <string name="perm_location">Местоположение</string>
+    <string name="perm_location_desc">Может определять ваше местоположение</string>
+    <string name="perm_contacts">Чтение контактов</string>
+    <string name="perm_contacts_desc">Может читать список ваших контактов</string>
+    <string name="perm_sms_read">Чтение SMS</string>
+    <string name="perm_sms_read_desc">Может читать ваши SMS-сообщения</string>
+    <string name="perm_sms_send">Отправка SMS</string>
+    <string name="perm_sms_send_desc">Может отправлять SMS (возможно платные!)</string>
+    <string name="perm_phone">Телефонные звонки</string>
+    <string name="perm_phone_desc">Может совершать звонки и видеть журнал вызовов</string>
+    <string name="perm_storage">Доступ к файлам</string>
+    <string name="perm_storage_desc">Может читать и записывать файлы на устройстве</string>
+    <string name="perm_calendar">Доступ к календарю</string>
+    <string name="perm_calendar_desc">Может читать и изменять события календаря</string>
+    <string name="perm_boot">Автозапуск</string>
+    <string name="perm_boot_desc">Запускается автоматически при включении устройства</string>
+    <string name="perm_overlay">Наложение поверх окон</string>
+    <string name="perm_overlay_desc">Может показывать окна поверх других приложений</string>
+    <string name="perm_admin">Администратор устройства</string>
+    <string name="perm_admin_desc">Может управлять настройками безопасности устройства</string>
+    <string name="perm_accessibility">Специальные возможности</string>
+    <string name="perm_accessibility_desc">Может контролировать экран и действия пользователя</string>
+    <string name="perm_unknown">Неизвестное разрешение</string>
+    <string name="perm_unknown_desc">%s</string>
+</resources>
