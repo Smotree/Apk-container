@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "com.apkcontainer"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 28 // Required for BlackBox hidden API access via JNI
         versionCode = 1
         versionName = "1.0.0"
 
