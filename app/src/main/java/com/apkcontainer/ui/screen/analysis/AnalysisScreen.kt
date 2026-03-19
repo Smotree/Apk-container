@@ -38,7 +38,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,25 +58,12 @@ fun AnalysisScreen(
     viewModel: AnalysisViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     LaunchedEffect(apkPath) {
         viewModel.analyze(apkPath)
     }
 
-    // Launch system installer when intent is ready
-    LaunchedEffect(state.installIntent) {
-        state.installIntent?.let { intent ->
-            try {
-                context.startActivity(intent)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            viewModel.onInstallIntentConsumed()
-        }
-    }
-
-    // Navigate to detail after saving
+    // Navigate to detail after install in BlackBox
     LaunchedEffect(state.installedAppId) {
         state.installedAppId?.let { onInstalled(it) }
     }

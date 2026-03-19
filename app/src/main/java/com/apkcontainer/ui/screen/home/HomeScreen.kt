@@ -46,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.apkcontainer.R
 import com.apkcontainer.sandbox.SandboxManager
 import com.apkcontainer.sandbox.SandboxStatus
+
 import com.apkcontainer.ui.components.AppCard
 import com.apkcontainer.ui.theme.RiskCritical
 import com.apkcontainer.ui.theme.RiskLow
@@ -127,7 +128,7 @@ private fun SandboxStatusBanner(
     status: SandboxStatus,
     onClick: () -> Unit
 ) {
-    val isActive = status == SandboxStatus.WORK_PROFILE_ACTIVE
+    val isActive = status == SandboxStatus.ACTIVE
     val bannerColor = if (isActive) RiskLow else RiskMedium
 
     Card(

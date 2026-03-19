@@ -1,6 +1,5 @@
 package com.apkcontainer.ui.screen.analysis
 
-import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apkcontainer.data.apk.ApkAnalysisResult
@@ -19,8 +18,7 @@ data class AnalysisUiState(
     val result: ApkAnalysisResult? = null,
     val error: String? = null,
     val isInstalling: Boolean = false,
-    val installedAppId: Long? = null,
-    val installIntent: Intent? = null
+    val installedAppId: Long? = null
 )
 
 @HiltViewModel
@@ -55,39 +53,30 @@ class AnalysisViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Store APK in sandbox private directory
-                val storedApk = virtualContainer.storeApk(
-                    result.app.apkPath,
-                    result.app.packageName
-                )
+                // Install into BlackBox virtual container (no system dialog needed)
+                val installResult = virtualContainer.installApp(result.app.apkPath)
 
-                // Save to database
-                val appId = appRepository.insertApp(
-                    result.app.copy(isInstalledInSandbox = true)
-                )
-
-                // Create install intent
-                val intent = if (storedApk != null) {
-                    virtualContainer.createInstallIntent(storedApk)
+                if (installResult.success) {
+                    // Save to our database for tracking
+                    val appId = appRepository.insertApp(
+                        result.app.copy(isInstalledInSandbox = true)
+                    )
+                    _state.value = _state.value.copy(
+                        isInstalling = false,
+                        installedAppId = appId
+                    )
                 } else {
-                    null
+                    _state.value = _state.value.copy(
+                        isInstalling = false,
+                        error = "Ошибка установки: ${installResult.msg}"
+                    )
                 }
-
-                _state.value = _state.value.copy(
-                    isInstalling = false,
-                    installedAppId = appId,
-                    installIntent = intent
-                )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isInstalling = false,
-                    error = e.message
+                    error = "Ошибка: ${e.message}"
                 )
             }
         }
-    }
-
-    fun onInstallIntentConsumed() {
-        _state.value = _state.value.copy(installIntent = null)
     }
 }

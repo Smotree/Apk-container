@@ -1,24 +1,22 @@
 package com.apkcontainer.sandbox
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import top.niunaijun.blackbox.BlackBoxCore
+import top.niunaijun.blackbox.entity.pm.InstallResult
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Virtual container that provides app isolation by:
- * 1. Copying APK to a private directory
- * 2. Installing with a modified package name (clone)
- * 3. Each "sandboxed" app runs as a separate installation with its own data
- * 4. No access to the original app's accounts/data
- *
- * This approach works on ALL devices including MIUI without root or Work Profile.
+ * Virtual container using BlackBox engine.
+ * Provides true process-level app isolation:
+ * - Apps run in a virtual environment inside the host process
+ * - No access to host's accounts, contacts, or files
+ * - All data stored in host app's private directory
+ * - Works on ALL devices including MIUI without root
  */
 @Singleton
 class VirtualContainer @Inject constructor(
@@ -26,110 +24,68 @@ class VirtualContainer @Inject constructor(
 ) {
     companion object {
         private const val TAG = "VirtualContainer"
-        const val SANDBOX_PREFIX = "sandbox_"
+        private const val USER_ID = 0 // Default virtual user
     }
 
-    private val sandboxDir: File
-        get() = File(context.filesDir, "sandbox_apks").also { it.mkdirs() }
-
     /**
-     * Copy APK to sandbox private storage
+     * Install APK into the virtual container.
+     * The app will be completely isolated from the host device.
      */
-    fun storeApk(apkPath: String, packageName: String): File? {
-        return try {
-            val source = File(apkPath)
-            val dest = File(sandboxDir, "${SANDBOX_PREFIX}${packageName}.apk")
-            source.copyTo(dest, overwrite = true)
-            Log.d(TAG, "APK stored: ${dest.absolutePath}")
-            dest
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to store APK", e)
-            null
+    fun installApp(apkPath: String): InstallResult {
+        val apkFile = File(apkPath)
+        if (!apkFile.exists()) {
+            return InstallResult().apply {
+                // Will have success=false by default
+            }
         }
+
+        Log.d(TAG, "Installing APK into virtual container: $apkPath")
+        return BlackBoxCore.get().installPackageAsUser(apkFile, USER_ID)
     }
 
     /**
-     * Get the stored APK file for a package
+     * Launch an app inside the virtual container.
+     * The app runs in an isolated process with its own data.
      */
-    fun getStoredApk(packageName: String): File? {
-        val file = File(sandboxDir, "${SANDBOX_PREFIX}${packageName}.apk")
-        return if (file.exists()) file else null
+    fun launchApp(packageName: String): Boolean {
+        Log.d(TAG, "Launching app in virtual container: $packageName")
+        return BlackBoxCore.get().launchApk(packageName, USER_ID)
     }
 
     /**
-     * Create install intent for the APK
-     * Uses the system package installer
+     * Uninstall an app from the virtual container.
+     * All app data within the container is removed.
      */
-    fun createInstallIntent(apkFile: File): Intent {
-        val uri = androidx.core.content.FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            apkFile
-        )
-
-        return Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/vnd.android.package-archive")
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
-        }
+    fun uninstallApp(packageName: String) {
+        Log.d(TAG, "Uninstalling from virtual container: $packageName")
+        BlackBoxCore.get().uninstallPackageAsUser(packageName, USER_ID)
     }
 
     /**
-     * Check if a package is installed on the device
+     * Check if an app is installed in the virtual container.
      */
     fun isInstalled(packageName: String): Boolean {
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(
-                    packageName,
-                    PackageManager.PackageInfoFlags.of(0)
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getPackageInfo(packageName, 0)
-            }
-            true
-        } catch (e: PackageManager.NameNotFoundException) {
-            false
-        }
+        return BlackBoxCore.get().isInstalled(packageName, USER_ID)
     }
 
     /**
-     * Create intent to launch an installed app
+     * Get all apps installed in the virtual container.
      */
-    fun createLaunchIntent(packageName: String): Intent? {
-        return context.packageManager.getLaunchIntentForPackage(packageName)?.apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+    fun getInstalledPackages(): List<PackageInfo> {
+        return BlackBoxCore.get().getInstalledPackages(0, USER_ID)
     }
 
     /**
-     * Create intent to uninstall an app
+     * Clear all data for an app in the virtual container.
      */
-    fun createUninstallIntent(packageName: String): Intent {
-        return Intent(Intent.ACTION_DELETE).apply {
-            data = android.net.Uri.parse("package:$packageName")
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+    fun clearAppData(packageName: String) {
+        BlackBoxCore.get().clearPackage(packageName, USER_ID)
     }
 
     /**
-     * Remove stored APK
+     * Stop an app running in the virtual container.
      */
-    fun removeStoredApk(packageName: String) {
-        val file = File(sandboxDir, "${SANDBOX_PREFIX}${packageName}.apk")
-        if (file.exists()) {
-            file.delete()
-            Log.d(TAG, "Removed stored APK for $packageName")
-        }
-    }
-
-    /**
-     * Get all stored APK package names
-     */
-    fun getStoredPackages(): List<String> {
-        return sandboxDir.listFiles()
-            ?.filter { it.name.startsWith(SANDBOX_PREFIX) && it.name.endsWith(".apk") }
-            ?.map { it.name.removePrefix(SANDBOX_PREFIX).removeSuffix(".apk") }
-            ?: emptyList()
+    fun stopApp(packageName: String) {
+        BlackBoxCore.get().stopPackage(packageName, USER_ID)
     }
 }

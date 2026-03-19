@@ -100,6 +100,10 @@ dependencies {
     // DataStore for settings
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
+    // BlackBox Virtual Engine (sandbox)
+    implementation(project(":Bcore"))
+    annotationProcessor(project(":compiler"))
+
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

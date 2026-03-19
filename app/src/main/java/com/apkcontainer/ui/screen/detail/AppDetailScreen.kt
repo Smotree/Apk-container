@@ -81,15 +81,11 @@ fun AppDetailScreen(
                     }
                 },
                 actions = {
-                    // Launch button
+                    // Launch button — runs app inside BlackBox container
                     IconButton(onClick = {
-                        app?.let {
-                            val launchIntent = context.packageManager.getLaunchIntentForPackage(it.packageName)
-                            if (launchIntent != null) {
-                                context.startActivity(launchIntent)
-                            } else {
-                                Toast.makeText(context, "Приложение не установлено на устройстве", Toast.LENGTH_SHORT).show()
-                            }
+                        val launched = viewModel.launchApp()
+                        if (!launched) {
+                            Toast.makeText(context, "Не удалось запустить приложение в песочнице", Toast.LENGTH_SHORT).show()
                         }
                     }) {
                         Icon(
@@ -139,7 +135,12 @@ fun AppDetailScreen(
                 }
 
                 when (selectedTab) {
-                    0 -> OverviewTab(app)
+                    0 -> OverviewTab(app, onLaunch = {
+                        val launched = viewModel.launchApp()
+                        if (!launched) {
+                            Toast.makeText(context, "Не удалось запустить", Toast.LENGTH_SHORT).show()
+                        }
+                    })
                     1 -> PermissionsTab(app)
                     2 -> NetworkTab(state.networkEvents)
                 }
@@ -170,8 +171,7 @@ fun AppDetailScreen(
 }
 
 @Composable
-private fun OverviewTab(app: com.apkcontainer.domain.model.SandboxApp) {
-    val context = LocalContext.current
+private fun OverviewTab(app: com.apkcontainer.domain.model.SandboxApp, onLaunch: () -> Unit) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -201,14 +201,7 @@ private fun OverviewTab(app: com.apkcontainer.domain.model.SandboxApp) {
         // Launch button
         item {
             Button(
-                onClick = {
-                    val launchIntent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                    if (launchIntent != null) {
-                        context.startActivity(launchIntent)
-                    } else {
-                        Toast.makeText(context, "Приложение не установлено на устройстве", Toast.LENGTH_SHORT).show()
-                    }
-                },
+                onClick = onLaunch,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.PlayArrow, contentDescription = null)
