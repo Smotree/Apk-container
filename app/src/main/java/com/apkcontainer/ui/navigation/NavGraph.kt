@@ -6,11 +6,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.apkcontainer.sandbox.SandboxManager
 import com.apkcontainer.ui.screen.analysis.AnalysisScreen
 import com.apkcontainer.ui.screen.detail.AppDetailScreen
 import com.apkcontainer.ui.screen.home.HomeScreen
 import com.apkcontainer.ui.screen.install.InstallScreen
 import com.apkcontainer.ui.screen.network.NetworkScreen
+import com.apkcontainer.ui.screen.sandbox.SandboxSetupScreen
 import com.apkcontainer.ui.screen.settings.SettingsScreen
 
 object Routes {
@@ -20,6 +22,7 @@ object Routes {
     const val DETAIL = "detail/{appId}"
     const val NETWORK = "network"
     const val SETTINGS = "settings"
+    const val SANDBOX_SETUP = "sandbox_setup"
 
     fun analysis(apkPath: String) = "analysis/${java.net.URLEncoder.encode(apkPath, "UTF-8")}"
     fun detail(appId: Long) = "detail/$appId"
@@ -28,6 +31,7 @@ object Routes {
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
+    sandboxManager: SandboxManager,
     onThemeChanged: (String) -> Unit
 ) {
     NavHost(
@@ -39,7 +43,9 @@ fun AppNavGraph(
                 onInstallClick = { navController.navigate(Routes.INSTALL) },
                 onAppClick = { appId -> navController.navigate(Routes.detail(appId)) },
                 onSettingsClick = { navController.navigate(Routes.SETTINGS) },
-                onNetworkClick = { navController.navigate(Routes.NETWORK) }
+                onNetworkClick = { navController.navigate(Routes.NETWORK) },
+                onSandboxSetupClick = { navController.navigate(Routes.SANDBOX_SETUP) },
+                sandboxManager = sandboxManager
             )
         }
 
@@ -93,6 +99,13 @@ fun AppNavGraph(
             SettingsScreen(
                 onBack = { navController.popBackStack() },
                 onThemeChanged = onThemeChanged
+            )
+        }
+
+        composable(Routes.SANDBOX_SETUP) {
+            SandboxSetupScreen(
+                sandboxManager = sandboxManager,
+                onBack = { navController.popBackStack() }
             )
         }
     }

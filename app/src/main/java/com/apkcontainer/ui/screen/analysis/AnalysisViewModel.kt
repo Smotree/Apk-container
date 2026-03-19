@@ -1,10 +1,12 @@
 package com.apkcontainer.ui.screen.analysis
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apkcontainer.data.apk.ApkAnalysisResult
 import com.apkcontainer.data.apk.ApkAnalyzer
 import com.apkcontainer.domain.repository.AppRepository
+import com.apkcontainer.sandbox.VirtualContainer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,13 +19,15 @@ data class AnalysisUiState(
     val result: ApkAnalysisResult? = null,
     val error: String? = null,
     val isInstalling: Boolean = false,
-    val installedAppId: Long? = null
+    val installedAppId: Long? = null,
+    val installIntent: Intent? = null
 )
 
 @HiltViewModel
 class AnalysisViewModel @Inject constructor(
     private val apkAnalyzer: ApkAnalyzer,
-    private val appRepository: AppRepository
+    private val appRepository: AppRepository,
+    private val virtualContainer: VirtualContainer
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AnalysisUiState())
@@ -51,12 +55,28 @@ class AnalysisViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Store APK in sandbox private directory
+                val storedApk = virtualContainer.storeApk(
+                    result.app.apkPath,
+                    result.app.packageName
+                )
+
+                // Save to database
                 val appId = appRepository.insertApp(
                     result.app.copy(isInstalledInSandbox = true)
                 )
+
+                // Create install intent
+                val intent = if (storedApk != null) {
+                    virtualContainer.createInstallIntent(storedApk)
+                } else {
+                    null
+                }
+
                 _state.value = _state.value.copy(
                     isInstalling = false,
-                    installedAppId = appId
+                    installedAppId = appId,
+                    installIntent = intent
                 )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
@@ -65,5 +85,9 @@ class AnalysisViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun onInstallIntentConsumed() {
+        _state.value = _state.value.copy(installIntent = null)
     }
 }

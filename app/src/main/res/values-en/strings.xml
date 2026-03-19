@@ -85,6 +85,22 @@
     <string name="settings_version">Version %s</string>
     <string name="settings_export_report">Export Report</string>
 
+    <!-- Sandbox Setup -->
+    <string name="sandbox_title">Sandbox Setup</string>
+    <string name="sandbox_status_active">Sandbox Active</string>
+    <string name="sandbox_status_active_desc">Apps are installed in an isolated work profile. Your data is protected.</string>
+    <string name="sandbox_status_inactive">Monitoring Mode</string>
+    <string name="sandbox_status_inactive_desc">Apps are analyzed before installation. VPN monitoring tracks network activity. For full isolation, a work profile is needed.</string>
+    <string name="sandbox_setup_button">Create Work Profile</string>
+    <string name="sandbox_setup_desc">A separate Android work profile will be created. Apps inside are fully isolated from your personal data.</string>
+    <string name="sandbox_adb_title">Alternative method (advanced)</string>
+    <string name="sandbox_adb_desc">Connect your phone to a computer and run:</string>
+    <string name="sandbox_adb_copied">Command copied</string>
+    <string name="sandbox_not_supported">Your device does not support work profiles</string>
+    <string name="sandbox_warning_no_isolation">Warning: sandbox is not configured. App will be installed without isolation!</string>
+    <string name="sandbox_install_anyway">Install without isolation</string>
+    <string name="sandbox_setup_first">Set up sandbox</string>
+
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

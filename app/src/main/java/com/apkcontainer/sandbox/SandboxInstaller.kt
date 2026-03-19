@@ -5,13 +5,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.core.content.FileProvider
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SandboxInstaller @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     /**
      * Install APK using system installer.

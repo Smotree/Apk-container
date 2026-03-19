@@ -85,6 +85,22 @@
     <string name="settings_version">Версия %s</string>
     <string name="settings_export_report">Экспорт отчёта</string>
 
+    <!-- Sandbox Setup -->
+    <string name="sandbox_title">Настройка песочницы</string>
+    <string name="sandbox_status_active">Песочница активна</string>
+    <string name="sandbox_status_active_desc">Приложения устанавливаются в изолированный рабочий профиль. Ваши данные защищены.</string>
+    <string name="sandbox_status_inactive">Режим мониторинга</string>
+    <string name="sandbox_status_inactive_desc">Приложения анализируются перед установкой. VPN-мониторинг отслеживает сетевую активность. Для полной изоляции нужен рабочий профиль.</string>
+    <string name="sandbox_setup_button">Создать рабочий профиль</string>
+    <string name="sandbox_setup_desc">Будет создан отдельный рабочий профиль Android. Приложения в нём полностью изолированы от ваших личных данных.</string>
+    <string name="sandbox_adb_title">Альтернативный способ (для продвинутых)</string>
+    <string name="sandbox_adb_desc">Подключите телефон к компьютеру и выполните команду:</string>
+    <string name="sandbox_adb_copied">Команда скопирована</string>
+    <string name="sandbox_not_supported">Ваше устройство не поддерживает рабочие профили</string>
+    <string name="sandbox_warning_no_isolation">Внимание: песочница не настроена. Приложение будет установлено без изоляции!</string>
+    <string name="sandbox_install_anyway">Установить без изоляции</string>
+    <string name="sandbox_setup_first">Настроить песочницу</string>
+
     <!-- Common -->
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>

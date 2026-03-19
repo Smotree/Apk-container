@@ -4,14 +4,20 @@ import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.UserManager
+import android.os.Build
 import android.util.Log
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
+enum class SandboxStatus {
+    WORK_PROFILE_ACTIVE,   // Full isolation — apps run in separate profile
+    NOT_CONFIGURED         // No isolation — apps run normally
+}
+
 @Singleton
 class SandboxManager @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     companion object {
         private const val TAG = "SandboxManager"
@@ -21,33 +27,29 @@ class SandboxManager @Inject constructor(
         get() = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
 
     private val adminComponent: ComponentName
-        get() = ComponentName(context, SandboxDeviceAdmin::class.java)
+        get() = SandboxDeviceAdmin.getComponentName(context)
 
     /**
-     * Check if the app is a device/profile owner (required for Work Profile management)
+     * Check if our app is the profile owner (Work Profile is active)
      */
     fun isProfileOwner(): Boolean {
         return devicePolicyManager.isProfileOwnerApp(context.packageName)
     }
 
     /**
-     * Check if the app has device admin privileges
+     * Get current sandbox status
      */
-    fun isDeviceAdmin(): Boolean {
-        return devicePolicyManager.isAdminActive(adminComponent)
+    fun getSandboxStatus(): SandboxStatus {
+        return if (isProfileOwner()) {
+            SandboxStatus.WORK_PROFILE_ACTIVE
+        } else {
+            SandboxStatus.NOT_CONFIGURED
+        }
     }
 
     /**
-     * Check if Work Profile is supported and available
-     */
-    fun isWorkProfileSupported(): Boolean {
-        val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
-        return userManager.isUserRunningOrStopping(android.os.Process.myUserHandle())
-    }
-
-    /**
-     * Create intent to provision a managed profile (Work Profile)
-     * The user will be asked to confirm creating a work profile
+     * Create intent to provision a managed Work Profile.
+     * This will ask the user to create a separate work space.
      */
     fun createProvisioningIntent(): Intent {
         return Intent(DevicePolicyManager.ACTION_PROVISION_MANAGED_PROFILE).apply {
@@ -55,40 +57,27 @@ class SandboxManager @Inject constructor(
                 DevicePolicyManager.EXTRA_PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME,
                 adminComponent
             )
-            putExtra(
-                DevicePolicyManager.EXTRA_PROVISIONING_SKIP_ENCRYPTION,
-                true
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                putExtra(
+                    DevicePolicyManager.EXTRA_PROVISIONING_ALLOW_OFFLINE,
+                    true
+                )
+            }
         }
     }
 
     /**
-     * Create intent to request device admin activation
+     * Check if the device supports Work Profile provisioning
      */
-    fun createDeviceAdminIntent(): Intent {
-        return Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-            putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
-            putExtra(
-                DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                "APK Контейнер использует администрирование устройства для создания безопасной песочницы"
-            )
-        }
+    fun canProvisionWorkProfile(): Boolean {
+        val intent = createProvisioningIntent()
+        return intent.resolveActivity(context.packageManager) != null
     }
 
     /**
-     * Get current sandbox status
+     * Get ADB command for manual profile owner setup (alternative method)
      */
-    fun getSandboxStatus(): SandboxStatus {
-        return when {
-            isProfileOwner() -> SandboxStatus.WORK_PROFILE_ACTIVE
-            isDeviceAdmin() -> SandboxStatus.DEVICE_ADMIN_ONLY
-            else -> SandboxStatus.NOT_CONFIGURED
-        }
+    fun getAdbSetupCommand(): String {
+        return "adb shell dpm set-profile-owner ${context.packageName}/${adminComponent.className}"
     }
-}
-
-enum class SandboxStatus {
-    WORK_PROFILE_ACTIVE,
-    DEVICE_ADMIN_ONLY,
-    NOT_CONFIGURED
 }
