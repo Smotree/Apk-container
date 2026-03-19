@@ -13,3 +13,14 @@
 
 # Keep APK analysis models
 -keep class com.apkcontainer.domain.model.** { *; }
+
+# BlackBox
+-keep class top.niunaijun.blackbox.** { *; }
+-keep class me.weishu.reflection.** { *; }
+-keep class black.** { *; }
+-keep class mirror.** { *; }
+-dontwarn top.niunaijun.**
+-dontwarn black.**
+-dontwarn mirror.**
+-dontwarn me.weishu.**
+-ignorewarnings

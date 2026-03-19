@@ -20,6 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep class me.weishu.reflection.** {*; }
 -keep class top.niunaijun.blackbox.** {*; }
 -keep class top.niunaijun.jnihook.** {*; }
 -keep class mirror.** {*; }

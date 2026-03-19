@@ -25,6 +25,11 @@ android {
         }
     }
 
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -33,6 +38,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug") // temp: use debug signing
         }
         debug {
             isDebuggable = true

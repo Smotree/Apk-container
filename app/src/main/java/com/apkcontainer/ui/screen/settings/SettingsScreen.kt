@@ -97,9 +97,7 @@ fun SettingsScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            onVpnToggle()
-                        }
+                        .clickable { onVpnToggle() }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -107,13 +105,33 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(stringResource(R.string.settings_vpn_monitoring), style = MaterialTheme.typography.titleMedium)
-                        Text(stringResource(R.string.settings_vpn_description), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if (state.vpnEnabled) {
+                            Text(stringResource(R.string.vpn_active), style = MaterialTheme.typography.bodySmall, color = com.apkcontainer.ui.theme.RiskLow)
+                        } else {
+                            Text(stringResource(R.string.settings_vpn_description), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                     Switch(
                         checked = state.vpnEnabled,
-                        onCheckedChange = {
-                            onVpnToggle()
-                        }
+                        onCheckedChange = { onVpnToggle() }
+                    )
+                }
+            }
+
+            // VPN error message
+            if (state.vpnError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = androidx.compose.material3.CardDefaults.cardColors(
+                        containerColor = com.apkcontainer.ui.theme.RiskCritical.copy(alpha = 0.1f)
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.vpn_error_other_active),
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = com.apkcontainer.ui.theme.RiskCritical
                     )
                 }
             }

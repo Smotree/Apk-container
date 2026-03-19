@@ -101,6 +101,10 @@
     <string name="sandbox_install_anyway">Установить без изоляции</string>
     <string name="sandbox_setup_first">Настроить песочницу</string>
 
+    <!-- VPN Errors -->
+    <string name="vpn_error_other_active">Не удалось запустить мониторинг: другой VPN уже активен. Отключите его в Настройках Android → Сеть → VPN</string>
+    <string name="vpn_active">Мониторинг активен</string>
+
     <!-- Common -->
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>

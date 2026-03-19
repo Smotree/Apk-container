@@ -1,6 +1,5 @@
 package com.apkcontainer.ui.screen.analysis
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -120,197 +119,107 @@ fun AnalysisScreen(
                 state.result != null -> {
                     val result = state.result!!
                     val riskScore = result.riskScore
-                    val animatedProgress by animateFloatAsState(
-                        targetValue = riskScore / 100f,
-                        label = "risk"
-                    )
 
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // App Info Header
-                        item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                elevation = CardDefaults.cardElevation(2.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            Icons.Default.Android,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(48.dp),
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        Column {
-                                            Text(
-                                                text = result.app.appName,
-                                                style = MaterialTheme.typography.titleLarge
-                                            )
-                                            Text(
-                                                text = stringResource(R.string.analysis_package_name, result.app.packageName),
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                            Text(
-                                                text = stringResource(R.string.analysis_version, result.app.versionName),
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Risk Score
-                        item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = riskColor(riskScore).copy(alpha = 0.1f)
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Static header — not in LazyColumn
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            // App name + risk score
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.Android,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(40.dp),
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Shield,
-                                            contentDescription = null,
-                                            tint = riskColor(riskScore),
-                                            modifier = Modifier.size(32.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Text(
-                                            text = stringResource(R.string.analysis_risk_score),
-                                            style = MaterialTheme.typography.titleMedium
-                                        )
-                                        Spacer(modifier = Modifier.weight(1f))
-                                        Text(
-                                            text = "$riskScore/100",
-                                            style = MaterialTheme.typography.headlineMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = riskColor(riskScore)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    LinearProgressIndicator(
-                                        progress = { animatedProgress },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(8.dp),
-                                        color = riskColor(riskScore),
-                                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(result.app.appName, style = MaterialTheme.typography.titleLarge)
+                                    Text(result.app.packageName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
+                                Text(
+                                    text = "$riskScore/100",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = riskColor(riskScore)
+                                )
                             }
-                        }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            LinearProgressIndicator(
+                                progress = { riskScore / 100f },
+                                modifier = Modifier.fillMaxWidth().height(6.dp),
+                                color = riskColor(riskScore),
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            )
 
-                        // Warnings
-                        if (result.warnings.isNotEmpty()) {
-                            item {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = RiskCritical.copy(alpha = 0.1f)
-                                    )
-                                ) {
-                                    Column(modifier = Modifier.padding(16.dp)) {
-                                        result.warnings.forEach { warning ->
-                                            Row(
-                                                modifier = Modifier.padding(vertical = 4.dp),
-                                                verticalAlignment = Alignment.Top
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.Warning,
-                                                    contentDescription = null,
-                                                    tint = RiskCritical,
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Text(
-                                                    text = warning,
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    color = RiskCritical
-                                                )
-                                            }
-                                        }
+                            // Warnings
+                            if (result.warnings.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                result.warnings.forEach { warning ->
+                                    Row(modifier = Modifier.padding(vertical = 2.dp), verticalAlignment = Alignment.Top) {
+                                        Icon(Icons.Default.Warning, contentDescription = null, tint = RiskCritical, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(warning, style = MaterialTheme.typography.bodySmall, color = RiskCritical)
                                     }
                                 }
                             }
-                        }
 
-                        // Components
-                        item {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = stringResource(R.string.analysis_components),
-                                        style = MaterialTheme.typography.titleMedium
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(stringResource(R.string.analysis_activities_count, result.app.activitiesCount))
-                                    Text(stringResource(R.string.analysis_services_count, result.app.servicesCount))
-                                    Text(stringResource(R.string.analysis_receivers_count, result.app.receiversCount))
-                                }
-                            }
-                        }
-
-                        // Permissions header
-                        item {
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = stringResource(R.string.analysis_permissions) + " (${result.permissions.size})",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(top = 8.dp)
+                                style = MaterialTheme.typography.titleMedium
                             )
                         }
 
-                        // Permission list
-                        items(
-                            items = result.permissions,
-                            key = { it.permission },
-                            contentType = { "permission" }
-                        ) { permission ->
-                            PermissionCard(permission = permission)
+                        // Permission list — only this scrolls
+                        LazyColumn(
+                            modifier = Modifier.weight(1f),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            items(
+                                items = result.permissions,
+                                key = { it.permission },
+                                contentType = { "perm" }
+                            ) { permission ->
+                                PermissionCard(permission = permission)
+                            }
                         }
 
-                        // Action buttons
-                        item {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        // Action buttons — fixed at bottom
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = onBack,
+                                modifier = Modifier.weight(1f)
                             ) {
-                                OutlinedButton(
-                                    onClick = onBack,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text(stringResource(R.string.analysis_cancel))
-                                }
-                                Button(
-                                    onClick = { viewModel.installInSandbox() },
-                                    modifier = Modifier.weight(1f),
-                                    enabled = !state.isInstalling,
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
+                                Text(stringResource(R.string.analysis_cancel))
+                            }
+                            Button(
+                                onClick = { viewModel.installInSandbox() },
+                                modifier = Modifier.weight(1f),
+                                enabled = !state.isInstalling,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                if (state.isInstalling) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp,
+                                        color = MaterialTheme.colorScheme.onPrimary
                                     )
-                                ) {
-                                    if (state.isInstalling) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(20.dp),
-                                            strokeWidth = 2.dp,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                    } else {
-                                        Text(stringResource(R.string.analysis_install_sandbox))
-                                    }
+                                } else {
+                                    Text(stringResource(R.string.analysis_install_sandbox))
                                 }
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }

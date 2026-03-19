@@ -101,6 +101,10 @@
     <string name="sandbox_install_anyway">Install without isolation</string>
     <string name="sandbox_setup_first">Set up sandbox</string>
 
+    <!-- VPN Errors -->
+    <string name="vpn_error_other_active">Cannot start monitoring: another VPN is active. Disable it in Android Settings → Network → VPN</string>
+    <string name="vpn_active">Monitoring active</string>
+
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
