@@ -1,5 +1,7 @@
 package com.apkcontainer.ui.screen.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +16,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BrightnessMedium
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.NetworkCheck
 import androidx.compose.material.icons.filled.Scanner
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +48,14 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    // VPN permission launcher
+    val vpnPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // Permission granted (or was already granted)
+        viewModel.startVpn()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -71,7 +80,18 @@ fun SettingsScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { viewModel.toggleVpn() }
+                        .clickable {
+                            if (state.vpnEnabled) {
+                                viewModel.stopVpn()
+                            } else {
+                                val vpnIntent = viewModel.getVpnPermissionIntent()
+                                if (vpnIntent != null) {
+                                    vpnPermissionLauncher.launch(vpnIntent)
+                                } else {
+                                    viewModel.startVpn()
+                                }
+                            }
+                        }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -81,7 +101,21 @@ fun SettingsScreen(
                         Text(stringResource(R.string.settings_vpn_monitoring), style = MaterialTheme.typography.titleMedium)
                         Text(stringResource(R.string.settings_vpn_description), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    Switch(checked = state.vpnEnabled, onCheckedChange = { viewModel.toggleVpn() })
+                    Switch(
+                        checked = state.vpnEnabled,
+                        onCheckedChange = {
+                            if (state.vpnEnabled) {
+                                viewModel.stopVpn()
+                            } else {
+                                val vpnIntent = viewModel.getVpnPermissionIntent()
+                                if (vpnIntent != null) {
+                                    vpnPermissionLauncher.launch(vpnIntent)
+                                } else {
+                                    viewModel.startVpn()
+                                }
+                            }
+                        }
+                    )
                 }
             }
 

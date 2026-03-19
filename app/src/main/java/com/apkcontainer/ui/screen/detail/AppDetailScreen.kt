@@ -243,7 +243,10 @@ private fun PermissionsTab(app: com.apkcontainer.domain.model.SandboxApp) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(app.permissions) { permission ->
+            items(
+                items = app.permissions,
+                key = { it.permission }
+            ) { permission ->
                 PermissionCard(permission = permission)
             }
         }
