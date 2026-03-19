@@ -272,7 +272,8 @@ fun AnalysisScreen(
                         // Permission list
                         items(
                             items = result.permissions,
-                            key = { it.permission }
+                            key = { it.permission },
+                            contentType = { "permission" }
                         ) { permission ->
                             PermissionCard(permission = permission)
                         }

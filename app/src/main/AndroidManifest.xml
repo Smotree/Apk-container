@@ -47,9 +47,10 @@
             </intent-filter>
         </activity>
 
-        <!-- VPN Service for network monitoring -->
+        <!-- VPN Service for network monitoring — separate process to avoid BlackBox hooks -->
         <service
             android:name=".service.SandboxVpnService"
+            android:process=":vpn"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:foregroundServiceType="specialUse"
             android:exported="false">

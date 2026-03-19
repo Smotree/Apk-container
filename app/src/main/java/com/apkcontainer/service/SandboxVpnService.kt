@@ -44,12 +44,15 @@ class SandboxVpnService : VpnService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "onStartCommand action=${intent?.action}")
         when (intent?.action) {
             ACTION_STOP -> {
+                Log.d(TAG, "Stopping VPN")
                 stopVpn()
                 return START_NOT_STICKY
             }
             else -> {
+                Log.d(TAG, "Starting VPN")
                 startForeground(NOTIFICATION_ID, createNotification())
                 startVpn()
             }
@@ -66,18 +69,24 @@ class SandboxVpnService : VpnService() {
                 .addDnsServer("8.8.8.8")
                 .addDnsServer("8.8.4.4")
                 .setMtu(1500)
-                .setBlocking(true)
 
-            // Exclude our own app from VPN to avoid loops
-            builder.addDisallowedApplication(packageName)
+            // Exclude our own app and BlackBox processes from VPN
+            try {
+                builder.addDisallowedApplication(packageName)
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not exclude own package: ${e.message}")
+            }
 
+            Log.d(TAG, "Calling establish()...")
             vpnInterface = builder.establish()
 
             if (vpnInterface != null) {
-                Log.d(TAG, "VPN interface established")
+                Log.d(TAG, "VPN interface established successfully")
                 startMonitoring()
             } else {
-                Log.e(TAG, "Failed to establish VPN interface")
+                Log.e(TAG, "establish() returned null — VPN permission may not be granted for this app")
+                // Try to continue as foreground service anyway
+                stopSelf()
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error starting VPN", e)

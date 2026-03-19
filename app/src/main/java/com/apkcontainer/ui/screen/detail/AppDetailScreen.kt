@@ -245,7 +245,8 @@ private fun PermissionsTab(app: com.apkcontainer.domain.model.SandboxApp) {
         ) {
             items(
                 items = app.permissions,
-                key = { it.permission }
+                key = { it.permission },
+                contentType = { "permission" }
             ) { permission ->
                 PermissionCard(permission = permission)
             }

@@ -1,8 +1,10 @@
 package com.apkcontainer.ui.screen.settings
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.apkcontainer.service.SandboxVpnService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,37 +24,47 @@ class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SettingsUiState())
+    private val _state = MutableStateFlow(SettingsUiState(
+        vpnEnabled = isVpnRunning()
+    ))
     val state: StateFlow<SettingsUiState> = _state
 
-    /**
-     * Returns VPN permission intent if needed, null if already granted.
-     */
+    private fun isVpnRunning(): Boolean {
+        val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        @Suppress("DEPRECATION")
+        return am.getRunningServices(50).any {
+            it.service.className == SandboxVpnService::class.java.name
+        }
+    }
+
     fun getVpnPermissionIntent(): Intent? {
         return VpnService.prepare(context)
     }
 
     fun startVpn() {
-        val intent = Intent(context, SandboxVpnService::class.java).apply {
-            action = SandboxVpnService.ACTION_START
+        try {
+            val intent = Intent(context, SandboxVpnService::class.java).apply {
+                action = SandboxVpnService.ACTION_START
+            }
+            context.startService(intent)
+            _state.value = _state.value.copy(vpnEnabled = true)
+            Log.d("SettingsVM", "VPN service start requested")
+        } catch (e: Exception) {
+            Log.e("SettingsVM", "Failed to start VPN: ${e.message}", e)
         }
-        context.startForegroundService(intent)
-        _state.value = _state.value.copy(vpnEnabled = true)
     }
 
     fun stopVpn() {
-        val intent = Intent(context, SandboxVpnService::class.java).apply {
-            action = SandboxVpnService.ACTION_STOP
+        try {
+            val intent = Intent(context, SandboxVpnService::class.java).apply {
+                action = SandboxVpnService.ACTION_STOP
+            }
+            context.startService(intent)
+            _state.value = _state.value.copy(vpnEnabled = false)
+            Log.d("SettingsVM", "VPN service stop requested")
+        } catch (e: Exception) {
+            Log.e("SettingsVM", "Failed to stop VPN: ${e.message}", e)
         }
-        context.startService(intent)
-        _state.value = _state.value.copy(vpnEnabled = false)
-    }
-
-    fun toggleVpn() {
-        if (_state.value.vpnEnabled) {
-            stopVpn()
-        }
-        // If enabling, caller must check VPN permission first
     }
 
     fun toggleAutoAnalysis() {
