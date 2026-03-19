@@ -25,6 +25,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../apk-container.keystore")
+            storePassword = "Apk-cont"
+            keyAlias = "apkcontainer"
+            keyPassword = "Apk-cont"
+        }
+    }
+
     lint {
         checkReleaseBuilds = false
         abortOnError = false
@@ -38,7 +47,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug") // temp: use debug signing
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isDebuggable = true
